@@ -11,7 +11,7 @@
 6. PHP v.8.1.x.
 7. Laravel v.latest.
 8. CSS-фреймворк - tailwind v.latest.
-9. JS-библиотека - async v.latest.
+9. JS-библиотека - axios v.latest.
 8. Завернуть всё это в докер-контейнер.
 ```
 
@@ -45,7 +45,7 @@ categories:
     number             - bigint
     
 users:
-    login              - varchar(255)
+    email              - varchar(255)
     password           - tinyint
     is_active          - bigint
 ```
