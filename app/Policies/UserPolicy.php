@@ -3,6 +3,7 @@
 namespace App\Policies;
 
 use App\Models\User;
+use App\Services\UserService;
 use Illuminate\Auth\Access\Response;
 
 class UserPolicy
@@ -26,25 +27,31 @@ class UserPolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user): bool
+    public function create(User $user): Response
     {
-        //
+        return UserService::validateRole($user, User::MAIN_ADMIN)
+            ? Response::allow()
+            : Response::deny();
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, User $model): bool
+    public function update(User $user, User $model): Response
     {
-        //
+        return UserService::validateRole($user, User::MAIN_ADMIN)
+            ? Response::allow()
+            : Response::deny();
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, User $model): bool
+    public function delete(User $user, User $model): Response
     {
-        //
+        return UserService::validateRole($user, User::MAIN_ADMIN)
+            ? Response::allow()
+            : Response::deny();
     }
 
     /**

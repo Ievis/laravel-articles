@@ -41,6 +41,11 @@ class RouteServiceProvider extends ServiceProvider
                     ->namespace($this->api_controllers_namespace)
                     ->group(base_path($this->api_root_directory . $route_file));
             }
+
+            Route::middleware('api')
+                ->prefix('api/auth')
+                ->namespace('App\Http\Controllers')
+                ->group(base_path('routes/auth.php'));
         });
     }
 }
