@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->string('slug')->unique();
             $table->foreignId('category_id')->constrained()->cascadeOnDelete();
             $table->string('image');
-            $table->boolean('is_active');
+            $table->boolean('is_active')->default(false);
             $table->unsignedBigInteger('number_in_category');
             $table->timestamps();
         });

@@ -23,7 +23,8 @@ class UserCollectionResource extends ResourceCollection
             return [
                 'id' => $user->id,
                 'email' => $user->email,
-                'role' => $user->role
+                'role' => $user->role,
+                'is_active' => $user->is_active
             ];
         })->toArray();
     }

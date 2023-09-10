@@ -8,6 +8,6 @@ Route::get('/articles/{article}', 'ArticleController@show');
 
 Route::group(['middleware' => 'jwt.auth'], function () {
     Route::post('/articles', 'ArticleController@store')->can('create', Article::class);
-    Route::post('/articles/{article}', 'ArticleController@show')->can('update', 'article');
+    Route::post('/articles/{article}', 'ArticleController@update')->can('update', 'article');
     Route::delete('/articles/{article}', 'ArticleController@delete')->can('delete', 'article');
 });

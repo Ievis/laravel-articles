@@ -22,13 +22,16 @@ class CreateArticleRequest extends FormRequest
     {
         $category_id = request()->input('category_id');
         $category = Category::find($category_id);
-        $articles_count = $category?->articles()?->count();
+        $articles_count = $category
+            ?->articles()
+            ?->where('is_active', true)
+            ?->count();
 
         return [
             'name' => 'required|string|max:255|unique:articles',
             'slug' => 'required|string|max:255|unique:articles',
             'category_id' => 'required|integer|exists:categories,id',
-            'image' => 'image|size:15360',
+            'image' => 'required|image|max:15360',
             'is_active' => 'nullable|boolean',
             'number_in_category' => 'nullable|integer|between:1,' . $articles_count + 1
         ];
@@ -53,6 +56,7 @@ class CreateArticleRequest extends FormRequest
             'category_id.required' => 'Укажите категорию для публикуемой статьи',
             'category_id.integer' => 'Укажите категорию для публикуемой статьи в целочисленном формате',
             'category_id.exists' => 'Укажите существующую категорию для публикуемой статьи',
+            'image.required' => 'Загрузите фото статьи',
             'image.image' => 'Загрузите фото статьи',
             'image.size' => 'Загрузите фото статьи с размером не более 15 Мб',
             'is_active.boolean' => 'Укажите, актвна ли статья, в формате true/false',

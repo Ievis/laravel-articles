@@ -6,7 +6,6 @@ use App\Exceptions\BadCredentials;
 use App\Http\Requests\LoginRequest;
 use App\Http\Requests\RegisterRequest;
 use App\Services\UserService;
-use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
@@ -17,11 +16,11 @@ class AuthController extends Controller
 
     public function register(RegisterRequest $request)
     {
-//        $data = $request->validated();
-//        $user = UserService::createUser($data);
-//
-//        $token = auth()->login($user);
-//        return $this->respondWithToken($token);
+        $data = $request->validated();
+        $user = UserService::createUser($data);
+
+        $token = auth()->login($user);
+        return $this->respondWithToken($token);
     }
 
     public function login(LoginRequest $request)
@@ -38,7 +37,7 @@ class AuthController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $user
+            'data' => collect($user)->except(['created_at', 'updated_at'])
         ])
             ->header('Charset', 'utf-8')
             ->setEncodingOptions(JSON_UNESCAPED_UNICODE);
@@ -71,6 +70,7 @@ class AuthController extends Controller
                 ->header('Charset', 'utf-8')
                 ->setEncodingOptions(JSON_UNESCAPED_UNICODE);;
         }
+
         return response()->json([
             'success' => true,
             'data' => [

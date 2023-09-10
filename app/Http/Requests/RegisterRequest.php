@@ -20,7 +20,8 @@ class RegisterRequest extends FormRequest
     {
         return [
             'email' => 'required|email|string|max:255|unique:users',
-            'password' => 'required|string|min:6|max:255|confirmed'
+            'password' => 'required|string|min:6|max:255|confirmed',
+            'role' => 'nullable|string|max:255'
         ];
     }
 
@@ -39,7 +40,9 @@ class RegisterRequest extends FormRequest
             'password.required' => 'Введите пароль',
             'password.min' => 'Минимальная длина пароля - 6 символов',
             'password.max' => 'Максимальная длина пароля - 255 символов',
-            'password.confirmed' => 'Введённые пароли не совпадают'
+            'password.confirmed' => 'Введённые пароли не совпадают',
+            'role.string' => 'Укажите роль пользователя в формате строки',
+            'role.max' => 'Укажите роль пользователя в формате строки с максимальной длиной в 255 символов'
         ];
     }
 }

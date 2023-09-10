@@ -21,15 +21,22 @@ class UpdateArticleRequest extends FormRequest
     {
         $category_id = request()->input('category_id');
         $category = Category::find($category_id);
-        $articles_count = $category?->articles()?->count();
+        $articles_count = $category
+            ?->articles()
+            ?->where('is_active', true)
+            ?->count();
+
+        $max_number = request('article')->is_active
+            ? $articles_count
+            : $articles_count + 1;
 
         return [
             'name' => 'required|string|max:255|unique:articles,name,' . request('article')->id,
             'slug' => 'required|string|max:255|unique:articles,name,' . request('article')->id,
             'category_id' => 'required|integer|exists:categories,id',
-            'image' => 'image|size:15360',
+            'image' => 'required|image|max:15360',
             'is_active' => 'nullable|boolean',
-            'number_in_category' => 'nullable|integer|between:1,' . $articles_count
+            'number_in_category' => 'nullable|integer|between:1,' . $max_number
         ];
     }
 
@@ -52,8 +59,9 @@ class UpdateArticleRequest extends FormRequest
             'category_id.required' => 'Укажите категорию для публикуемой статьи',
             'category_id.integer' => 'Укажите категорию для публикуемой статьи в целочисленном формате',
             'category_id.exists' => 'Укажите существующую категорию для публикуемой статьи',
+            'image.required' => 'Загрузите фото статьи',
             'image.image' => 'Загрузите фото статьи',
-            'image.size' => 'Загрузите фото статьи с размером не более 15 Мб',
+            'image.max' => 'Загрузите фото статьи с размером не более 15 Мб',
             'is_active.boolean' => 'Укажите, актвна ли статья, в формате true/false',
             'number_in_category.integer' => 'Введите порядковый номер статьи в категории в целочисленном формате',
             'number_in_category.between' => 'Введите порядковый номер статьи в категории в целочисленном формате от :min до :max'

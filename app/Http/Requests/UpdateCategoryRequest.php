@@ -19,10 +19,16 @@ class UpdateCategoryRequest extends FormRequest
 
     public function rules(): array
     {
+        $active_categories_count = Category::query()->where('is_active', true)->count();
+
+        $max_number = request('category')->is_active
+            ? $active_categories_count
+            : $active_categories_count + 1;
+
         return [
-            'name' => 'required|string|max:255|unique:categories,name' . request('category')->id,
+            'name' => 'required|string|max:255|unique:categories,name,' . request('category')->id,
             'is_active' => 'nullable|boolean',
-            'number' => 'nullable|integer|between:1,' . Category::count()
+            'number' => 'nullable|integer|between:1,' . $max_number
         ];
     }
 

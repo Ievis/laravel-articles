@@ -19,10 +19,12 @@ class CreateCategoryRequest extends FormRequest
 
     public function rules(): array
     {
+        $active_categories_count = Category::query()->where('is_active', true)->count();
+
         return [
             'name' => 'required|string|max:255|unique:categories',
             'is_active' => 'nullable|boolean',
-            'number' => 'nullable|integer|between:1,' . Category::count() + 1
+            'number' => 'nullable|integer|between:1,' . $active_categories_count + 1
         ];
     }
 
