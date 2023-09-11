@@ -1,0 +1,48 @@
+axios.defaults.baseURL = 'http://localhost:8000/api'
+
+const button = document.getElementById('button');
+const alert = document.getElementById('alert');
+const alerts = document.getElementById('alerts');
+button.addEventListener('click', register);
+
+async function register() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const password_confirmation = document.getElementById('password_confirmation').value;
+
+    await axios.post("/auth/register", {
+        email,
+        password,
+        password_confirmation
+    })
+        .then((response) => {
+            alerts.innerHTML = '';
+
+            if (response.data.success) {
+                alert.classList.remove('visible');
+                alert.classList.toggle('invisible');
+
+                localStorage.setItem('access_token', response.data.data.access_token);
+                window.location.href = "http://localhost:8000/";
+            } else {
+
+            }
+
+        })
+        .catch(({response}) => {
+            alerts.innerHTML = '';
+
+            const messages = response.data.data;
+            alert.classList.remove('invisible');
+            alert.classList.toggle('visible');
+
+            Object.keys(messages).map((message) => {
+                const alert = document.createElement('p');
+                alert.innerHTML = messages[message];
+                alerts.appendChild(alert);
+            });
+        })
+}
+
+
+

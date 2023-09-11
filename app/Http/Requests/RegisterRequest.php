@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Exceptions\ValidationException;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Log;
 
 class RegisterRequest extends FormRequest
 {
