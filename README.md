@@ -27,24 +27,30 @@ docker exec -it mamr_app chmod -R 777 /var/www
 #### 5. Сгенерировать ключ приложения, кэшировать маршруты, сгенерировать jwt-ключ приложения
 
 ```
-1. docker exec -it mamr_app php /var/www/artisan key:generate
-2. docker exec -it mamr_app php /var/www/artisan route:cache
-3. docker exec -it mamr_app php /var/www/artisan jwt:secret
+docker exec -it mamr_app php /var/www/artisan key:generate
+docker exec -it mamr_app php /var/www/artisan route:cache
+docker exec -it mamr_app php /var/www/artisan jwt:secret --force
 ```
 
 
 #### 6. Выполнить миграцию БД
 
 ```
-docker exec -it mamr_app php /var/www/artisan migrate
+docker exec -it mamr_app php /var/www/artisan migrate --force
 ```
 
-#### 7. Выполнить seed'ы
+#### 7. Запустить тесты
 
 ```
-1. docker exec -it mamr_app php /var/www/artisan db:seed --class=UserSeeder
-2. docker exec -it mamr_app php /var/www/artisan db:seed --class=CategorySeeder
-3. docker exec -it mamr_app php /var/www/artisan db:seed --class=ArticleSeeder
+docker exec -it mamr_app php /var/www/artisan test
+```
+
+#### 8. Выполнить seed'ы
+
+```
+docker exec -it mamr_app php /var/www/artisan db:seed --class=UserSeeder --force
+docker exec -it mamr_app php /var/www/artisan db:seed --class=CategorySeeder --force
+docker exec -it mamr_app php /var/www/artisan db:seed --class=ArticleSeeder --force
 ```
 
 #### Готово
