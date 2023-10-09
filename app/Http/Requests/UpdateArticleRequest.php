@@ -24,10 +24,11 @@ class UpdateArticleRequest extends FormRequest
         $articles_count = $category
             ?->articles()
             ?->where('is_active', true)
+            ?->get()
             ?->count();
 
         $max_number = request('article')->is_active
-            ? $articles_count
+            ? (int)$articles_count
             : $articles_count + 1;
 
         return [

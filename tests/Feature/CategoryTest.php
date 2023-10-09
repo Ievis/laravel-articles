@@ -14,10 +14,23 @@ class CategoryTest extends TestCase
 {
     use RefreshDatabase;
 
+    private string $admin_access_token;
+    private string $main_admin_access_token;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->admin_access_token = $this->auth('admin');
+        $this->main_admin_access_token = $this->auth('main_admin');
+    }
+
     public function test_get_all_categories()
     {
-        $response = $this->get('/api/categories');
+        $categories = Category::factory(20)->create();
+        $response = $this->getJson('/api/categories');
 
+        $this->assertDatabaseCount('categories', $categories->count());
         $response->assertStatus(200)
             ->assertJsonFragment([
                 'success' => true
@@ -46,30 +59,22 @@ class CategoryTest extends TestCase
             ]);
     }
 
-    public function test_get_existing_category_by_id()
+    public function test_get_category_that_exists_by_id()
     {
         $category = Category::factory()->create();
 
-        $response = $this->get('/api/categories/' . $category->id);
+        $response = $this->getJson('/api/categories/' . $category->id);
 
         $response->assertStatus(200)
-            ->assertJsonFragment([
-                'success' => true
-            ])
-            ->assertJsonStructure([
-                'success',
-                'data' => [
-                    'id',
-                    'name',
-                    'number',
-                    'is_active'
-                ]
+            ->assertJson([
+                'success' => true,
+                'data' => collect($category)->except(['created_at', 'updated_at'])->toArray()
             ]);
     }
 
-    public function test_get_non_existing_category_by_id()
+    public function test_get_category_that_not_exists_by_id()
     {
-        $response = $this->get('/api/categories/' . 0);
+        $response = $this->getJson('/api/categories/' . 0);
 
         $response->assertStatus(404)
             ->assertJson([
@@ -81,18 +86,25 @@ class CategoryTest extends TestCase
     public function test_authorized_create_category()
     {
         $category = Category::factory()->make();
+
         $response = $this->postJson('/api/categories', [
             'name' => $category->name,
-            'number' => $category->number
+            'number' => $category->number,
+            'is_active' => $category->is_active
         ], [
-            'Authorization' => 'Bearer ' . $this->auth('main_admin')
+            'Authorization' => 'Bearer ' . $this->main_admin_access_token
         ]);
 
         $response->assertStatus(200)
             ->assertJson([
                 'success' => true,
-                'data' => []
+                'data' => collect($category)->except(['created_at', 'updated_at', 'is_active'])->toArray()
             ]);
+    }
+
+    public function test_authorized_invalid_request_create_category()
+    {
+
     }
 
     public function test_unauthorized_create_category()
@@ -102,7 +114,7 @@ class CategoryTest extends TestCase
             'name' => $category->name,
             'number' => $category->number
         ], [
-            'Authorization' => 'Bearer ' . $this->auth('admin')
+            'Authorization' => 'Bearer ' . $this->admin_access_token
         ]);
 
         $response->assertStatus(403)
@@ -127,42 +139,41 @@ class CategoryTest extends TestCase
             ]);
     }
 
-    public function test_authorized_update_category()
+    public function test_authorized_update_category_by_id()
     {
         $category = Category::factory()->create();
         $new_category = Category::factory()->make();
+
         $response = $this->postJson(
             '/api/categories/' . $category->id,
             collect($new_category)->except('id')->toArray(),
             [
-                'Authorization' => 'Bearer ' . $this->auth('main_admin')
+                'Authorization' => 'Bearer ' . $this->main_admin_access_token
             ]
         );
 
         $response->assertStatus(200)
-            ->assertJsonFragment([
-                'success' => true
-            ])
-            ->assertJsonStructure([
-                'success',
-                'data' => [
-                    'id',
-                    'name',
-                    'number',
-                    'is_active'
-                ]
+            ->assertJson([
+                'success' => true,
+                'data' => collect($new_category)->except(['created_at', 'updated_at'])->toArray()
             ]);
     }
 
-    public function test_unauthorized_update_category()
+    public function test_authorized_invalid_request_update_category_by_id()
+    {
+
+    }
+
+    public function test_unauthorized_update_category_by_id()
     {
         $category = Category::factory()->create();
         $new_category = Category::factory()->make();
+
         $response = $this->postJson(
             '/api/categories/' . $category->id,
             collect($new_category)->except('id')->toArray(),
             [
-                'Authorization' => 'Bearer ' . $this->auth('admin')
+                'Authorization' => 'Bearer ' . $this->admin_access_token
             ]
         );
 
@@ -173,7 +184,7 @@ class CategoryTest extends TestCase
             ]);
     }
 
-    public function test_unauthenticated_update_category()
+    public function test_unauthenticated_update_category_by_id()
     {
         $category = Category::factory()->create();
         $new_category = Category::factory()->make();
@@ -189,7 +200,7 @@ class CategoryTest extends TestCase
             ]);
     }
 
-    public function test_update_non_existing_category()
+    public function test_update_non_existing_category_by_id()
     {
         $category = Category::factory()->make();
         $response = $this->postJson('/api/categories/' . 0, [
@@ -203,33 +214,25 @@ class CategoryTest extends TestCase
             ]);
     }
 
-    public function test_authorized_delete_category()
+    public function test_authorized_delete_category_by_id()
     {
         $category = Category::factory()->create();
         $response = $this->deleteJson('/api/categories/' . $category->id, [], [
-            'Authorization' => 'Bearer ' . $this->auth('main_admin')
+            'Authorization' => 'Bearer ' . $this->main_admin_access_token
         ]);
 
         $response->assertStatus(200)
-            ->assertJsonFragment([
-                'success' => true
-            ])
-            ->assertJsonStructure([
-               'success',
-               'data' => [
-                   'id',
-                   'name',
-                   'number',
-                   'is_active'
-               ]
+            ->assertJson([
+                'success' => true,
+                'data' => collect($category)->except(['created_at', 'updated_at'])->toArray()
             ]);
     }
 
-    public function test_unauthorized_delete_category()
+    public function test_unauthorized_delete_category_by_id()
     {
         $category = Category::factory()->create();
         $response = $this->deleteJson('/api/categories/' . $category->id, [], [
-            'Authorization' => 'Bearer ' . $this->auth('admin')
+            'Authorization' => 'Bearer ' . $this->admin_access_token
         ]);
 
         $response->assertStatus(403)
@@ -239,7 +242,7 @@ class CategoryTest extends TestCase
             ]);
     }
 
-    public function test_unauthenticated_delete_category()
+    public function test_unauthenticated_delete_category_by_id()
     {
         $category = Category::factory()->create();
         $response = $this->deleteJson('/api/categories/' . $category->id);
@@ -251,7 +254,7 @@ class CategoryTest extends TestCase
             ]);
     }
 
-    public function test_delete_non_existing_category()
+    public function test_delete_non_existing_category_by_id()
     {
         $response = $this->deleteJson('/api/categories/' . 0);
 
@@ -264,10 +267,8 @@ class CategoryTest extends TestCase
 
     private function auth(string $role)
     {
-        $user = User::create([
-            'email' => fake()->email(),
-            'role' => $role,
-            'password' => Hash::make('password')
+        $user = User::factory()->create([
+            'role' => $role
         ]);
         $response = json_decode($this->postJson('/api/auth/login', [
             'email' => $user->email,
